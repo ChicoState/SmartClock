@@ -19,6 +19,8 @@ from kivy.storage.jsonstore import JsonStore
 from kivy.uix.button import Button
 import time
 import datetime
+import subprocess
+import os
 
 alarm_hour = 0;
 alarm_minute = 0
@@ -104,7 +106,31 @@ class Ticks(Widget):
         self.bind(pos=self.update_clock)
         self.bind(size=self.update_clock)
         Clock.schedule_interval(self.update_clock, 1)
+    def checkAlarm(self, *args):
+            global alarm_hour
+            global alarm_minute
+            now = datetime.datetime.now()
+            local_hour = int(now.hour)
+            local_minute = int(now.minute)
+            global wait_next_minute
 
+            #logic to ensure alarm function only fires once when it is the alarm time
+            if(wait_next_minute!=0 and local_minute!=alarm_minute):
+                wait_next_minute = 0
+            elif((local_hour == alarm_hour and local_minute == alarm_minute) and wait_next_minute == 0):
+                self.alarm_func()
+                wait_next_minute = 1
+    def alarm_func(self, *args):
+        import time
+        currentDay = time.strftime("%A")
+        currentDayNum = time.strftime("%d")
+        currentMonth = time.strftime("%B")
+        currentYear = time.strftime("%Y")
+        time = 'Today is {}, {} {} {},'.format(currentDay, currentMonth, currentDayNum, currentYear)
+        cmd = input("Good Morning! This is your alarm clock speaking! Time to wake up! {} {} {}")
+        sub = subprocess.Popen(cmd, stdout = subprocess.PIPE, shell = True, preexec_fn=os.setsid)
+        global alarm_pid
+        alarm_pid = os.getpgid(sub.pid)
 
     def update_clock(self, *args):
         self.canvas.clear()
@@ -117,7 +143,7 @@ class Ticks(Widget):
             Color(0.4, 0.7, 0.4)
             th = clocktime.hour*60 + clocktime.minute
             Line(points=[self.center_x, self.center_y, self.center_x+0.5*self.r*sin(pi/360*th), self.center_y+0.5*self.r*cos(pi/360*th)], width=3, cap="round")
-
+        Clock.schedule_interval(self.checkAlarm, 1)
 class PopupDismissButton(Button):
     def __init__(self, **kwargs):
         super(PopupDismissButton, self).__init__(**kwargs)
