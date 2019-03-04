@@ -1,0 +1,9 @@
+
+<AlarmScreen>:
+    SetAlarmButton
+    PopupDismissButton
+    Button:
+        text: 'home'
+        size_hint: .2, 1
+        pos_hint: {"x": 0, "center_y": .5}
+        on_press: root.manager.current = 'home'
