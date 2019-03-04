@@ -3,7 +3,6 @@
 
 from kivy.app import App
 import json
-
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Line
 from kivy.uix.floatlayout import FloatLayout
@@ -22,6 +21,9 @@ import datetime
 import subprocess
 import os
 
+Builder.load_file('alarmClock.kv');
+Builder.load_file('alarmScreen.kv');
+
 alarm_hour = 0;
 alarm_minute = 0
 alarm_changed = 0
@@ -34,63 +36,6 @@ kv = '''
     text: str(ctx.i)
     pos_hint: {"center_x": 0.5+0.42*math.sin(math.pi/6*(ctx.i-12)), "center_y": 0.5+0.42*math.cos(math.pi/6*(ctx.i-12))}
     font_size: self.height/16
-
-<HomeScreen>:
-    face: face
-    ticks: ticks
-    FloatLayout:
-        id: face
-        size_hint: None, None
-        pos_hint: {"center_x":0.75, "center_y":0.75}
-        size: 0.4*min(root.size), 0.4*min(root.size)
-        canvas:
-            Color:
-                rgb: 0.1, 0.1, 0.1
-            Ellipse:
-                size: self.size
-                pos: self.pos
-        ClockNumber:
-            i: 1
-        ClockNumber:
-            i: 2
-        ClockNumber:
-            i: 3
-        ClockNumber:
-            i: 4
-        ClockNumber:
-            i: 5
-        ClockNumber:
-            i: 6
-        ClockNumber:
-            i: 7
-        ClockNumber:
-            i: 8
-        ClockNumber:
-            i: 9
-        ClockNumber:
-            i: 10
-        ClockNumber:
-            i: 11
-        ClockNumber:
-            i: 12
-    Ticks:
-        id: ticks
-        r: min(root.size)*0.5/2
-        pos_hint: {"center_x":0.75, "center_y":0.75}
-    Button:
-        text: 'set alarm'
-        size_hint: .2, 1
-        pos_hint: {"x": 0, "center_y": .5}
-        on_press: root.manager.current = 'alarm'
-
-<AlarmScreen>:
-    SetAlarmButton
-    PopupDismissButton
-    Button:
-        text: 'home'
-        size_hint: .2, 1
-        pos_hint: {"x": 0, "center_y": .5}
-        on_press: root.manager.current = 'home'
 '''
 Builder.load_string(kv)
 
