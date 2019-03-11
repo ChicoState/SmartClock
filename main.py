@@ -33,8 +33,8 @@ alarm_minute = 0
 alarm_changed = 0
 wait_next_minute = 0
 col = [0,0,1,1]
-clr_picker = ColorPicker()
-parent.add_widget(colorpicker)
+#clr_picker = ColorPicker()
+#parent.add_widget(colorpicker)
 store = JsonStore('settings.json')
 kv = '''
 #:import math math
@@ -209,10 +209,10 @@ sm.add_widget(HomeScreen(name='home'))
 sm.add_widget(AlarmScreen(name='alarm'))
 sm.add_widget(LightScreen(name='lights'))
 
-sce = SelectedColorEllipse()
-sce.selected_color = self.selected_color
-sce.center = touch.pos
-self.add_widget(sce)
+#sce = SelectedColorEllipse()
+#sce.selected_color = self.selected_color
+#sce.center = touch.pos
+#self.add_widget(sce)
 
 class MyClockApp(App):
     def build(self):
