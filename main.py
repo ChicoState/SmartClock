@@ -113,13 +113,9 @@ class SetAlarmButton(Button):
         Clock.schedule_once(self.alarmPopup)
 
     def alarmPopup(self, *args):
-        #content of the popup to be sorted in this float layout
         box = FloatLayout()
-
-        #hour selector
         hourbutton = Button(text='Select Hour', size_hint=(.2,.2),
                             pos_hint={'x':.2, 'y':.5})
-        #dropdown menu which drops down from the hourbutton
         hourdropdown = DropDown()
         for i in range(24):
             if(i<10):
@@ -128,17 +124,12 @@ class SetAlarmButton(Button):
                 btn=Button(text = '%r' % i, size_hint_y=None, height =70)
             btn.bind(on_release=lambda btn: hourdropdown.select(btn.text))
             hourdropdown.add_widget(btn)
-
         hourbutton.bind(on_release=hourdropdown.open)
         hourdropdown.bind(on_select=lambda instance, x: setattr(hourbutton, 'text', x))
-        #add widgets to the popup's float layout
         box.add_widget(hourbutton)
         box.add_widget(hourdropdown)
-
-        #minute selector
         minutebutton = Button(text='Select Minute', size_hint=(.2,.2),
                             pos_hint={'x':.6, 'y':.5})
-        #dopdown menu which drops down from the minutebutton
         minutedropdown = DropDown()
         for i in range(60):
             if(i<10):
@@ -147,10 +138,8 @@ class SetAlarmButton(Button):
                 btn=Button(text = '%r' % i, size_hint_y=None, height =70)
             btn.bind(on_release=lambda btn: minutedropdown.select(btn.text))
             minutedropdown.add_widget(btn)
-
         minutebutton.bind(on_release=minutedropdown.open)
         minutedropdown.bind(on_select=lambda instance, x: setattr(minutebutton, 'text', x))
-        #add widgets to the popup's float layout
         box.add_widget(minutebutton)
         box.add_widget(minutedropdown)
 
