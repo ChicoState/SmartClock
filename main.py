@@ -11,11 +11,13 @@ from kivy.clock import Clock
 from functools import partial
 from kivy.lang import Builder
 from kivy.properties import NumericProperty
+from kivy.properties import ListProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.popup import Popup
 from kivy.uix.dropdown import DropDown
 from kivy.storage.jsonstore import JsonStore
 from kivy.uix.button import Button
+from kivy.uix.colorpicker import ColorPicker
 import time
 import datetime
 import subprocess
@@ -23,11 +25,15 @@ import os
 
 Builder.load_file('alarmClock.kv');
 Builder.load_file('alarmScreen.kv');
+Builder.load_file('lights.kv');
 
 alarm_hour = 0;
 alarm_minute = 0
 alarm_changed = 0
 wait_next_minute = 0
+col = [0,0,1,1]
+clr_picker = ColorPicker()
+parent.add_widget(colorpicker)
 store = JsonStore('settings.json')
 kv = '''
 #:import math math
@@ -44,6 +50,26 @@ class HomeScreen(Screen):
 
 class AlarmScreen(Screen):
     pass
+
+class LightScreen(Screen):
+    pass
+
+class LightButton(Button):
+   pass
+
+class SelectedColorEllipse(Widget):
+    selected_color = ListProperty(col)
+
+class ColPcker(ColorPicker):
+    pass
+
+class Ex40(Widget):
+    selected_color = ListProperty(col)
+    def select_ColPckr(self, *args):
+        ColPopup().open()
+    def on_touch_down(self,touch):
+        if touch.x < 100 and touch.y < 100:
+            return super(Ex40, self).on_touch_down(touch)
 
 class Ticks(Widget):
     def __init__(self, **kwargs):
@@ -194,15 +220,25 @@ class SetAlarmButton(Button):
             else:
                 self.text = "Set Alarm\n Currently {}:{}".format(alarm_hour, alarm_minute)
 
-
 sm = ScreenManager()
 sm.add_widget(HomeScreen(name='home'))
 sm.add_widget(AlarmScreen(name='alarm'))
+sm.add_widget(LightScreen(name='lights'))
+
+sce = SelectedColorEllipse()
+sce.selected_color = self.selected_color
+sce.center = touc.pos
+self.add_widger(sce)
+
 class MyClockApp(App):
     def build(self):
-
         return sm
+
+class Ex40App(App):
+    def build(self):
+        return Ex40()
 
 
 if __name__ == '__main__':
     MyClockApp().run()
+    Ex40App().run()
