@@ -42,6 +42,14 @@
         pos_hint: {"center_x":0.75, "center_y":0.75}
     Button:
         text: 'set alarm'
-        size_hint: .2, 1
-        pos_hint: {"x": 0, "center_y": .5}
+        height: 20
+        size_hint: .2, .2
+        pos_hint: {"x" : .1, "y" : .1} 
         on_press: root.manager.current = 'alarm'
+        background_color: (10,10,10)
+    Button: 
+        background_color: (10,10,10)
+        text: 'Lights'
+        size_hint: .2, .2
+        pos_hint: {"x" : .3, "y" : .3 } 
+        on_press: root.manager.current = 'lights'

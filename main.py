@@ -18,6 +18,7 @@ from kivy.uix.dropdown import DropDown
 from kivy.storage.jsonstore import JsonStore
 from kivy.uix.button import Button
 from kivy.uix.colorpicker import ColorPicker
+from kivy.core.audio import SoundLoader
 import time
 import datetime
 import subprocess
@@ -77,6 +78,7 @@ class Ticks(Widget):
         self.bind(pos=self.update_clock)
         self.bind(size=self.update_clock)
         Clock.schedule_interval(self.update_clock, 1)
+        Clock.schedule_interval(self.checkAlarm, 1)
     def checkAlarm(self, *args):
             global alarm_hour
             global alarm_minute
@@ -92,16 +94,9 @@ class Ticks(Widget):
                 self.alarm_func()
                 wait_next_minute = 1
     def alarm_func(self, *args):
-        import time
-        currentDay = time.strftime("%A")
-        currentDayNum = time.strftime("%d")
-        currentMonth = time.strftime("%B")
-        currentYear = time.strftime("%Y")
-        time = 'Today is {}, {} {} {},'.format(currentDay, currentMonth, currentDayNum, currentYear)
-        cmd = input("Good Morning! This is your alarm clock speaking! Time to wake up! {} {} {}")
-        sub = subprocess.Popen(cmd, stdout = subprocess.PIPE, shell = True, preexec_fn=os.setsid)
-        global alarm_pid
-        alarm_pid = os.getpgid(sub.pid)
+        sound = SoundLoader.load('alarm.wav')
+        if sound:
+            sound.play()
 
     def update_clock(self, *args):
         self.canvas.clear()
@@ -114,7 +109,7 @@ class Ticks(Widget):
             Color(0.4, 0.7, 0.4)
             th = clocktime.hour*60 + clocktime.minute
             Line(points=[self.center_x, self.center_y, self.center_x+0.5*self.r*sin(pi/360*th), self.center_y+0.5*self.r*cos(pi/360*th)], width=3, cap="round")
-        Clock.schedule_interval(self.checkAlarm, 1)
+
 class PopupDismissButton(Button):
     def __init__(self, **kwargs):
         super(PopupDismissButton, self).__init__(**kwargs)
@@ -144,13 +139,9 @@ class SetAlarmButton(Button):
         Clock.schedule_once(self.alarmPopup)
 
     def alarmPopup(self, *args):
-        #content of the popup to be sorted in this float layout
         box = FloatLayout()
-
-        #hour selector
         hourbutton = Button(text='Select Hour', size_hint=(.2,.2),
                             pos_hint={'x':.2, 'y':.5})
-        #dropdown menu which drops down from the hourbutton
         hourdropdown = DropDown()
         for i in range(24):
             if(i<10):
@@ -159,17 +150,12 @@ class SetAlarmButton(Button):
                 btn=Button(text = '%r' % i, size_hint_y=None, height =70)
             btn.bind(on_release=lambda btn: hourdropdown.select(btn.text))
             hourdropdown.add_widget(btn)
-
         hourbutton.bind(on_release=hourdropdown.open)
         hourdropdown.bind(on_select=lambda instance, x: setattr(hourbutton, 'text', x))
-        #add widgets to the popup's float layout
         box.add_widget(hourbutton)
         box.add_widget(hourdropdown)
-
-        #minute selector
         minutebutton = Button(text='Select Minute', size_hint=(.2,.2),
                             pos_hint={'x':.6, 'y':.5})
-        #dopdown menu which drops down from the minutebutton
         minutedropdown = DropDown()
         for i in range(60):
             if(i<10):
@@ -178,10 +164,8 @@ class SetAlarmButton(Button):
                 btn=Button(text = '%r' % i, size_hint_y=None, height =70)
             btn.bind(on_release=lambda btn: minutedropdown.select(btn.text))
             minutedropdown.add_widget(btn)
-
         minutebutton.bind(on_release=minutedropdown.open)
         minutedropdown.bind(on_select=lambda instance, x: setattr(minutebutton, 'text', x))
-        #add widgets to the popup's float layout
         box.add_widget(minutebutton)
         box.add_widget(minutedropdown)
 
@@ -227,18 +211,12 @@ sm.add_widget(LightScreen(name='lights'))
 
 sce = SelectedColorEllipse()
 sce.selected_color = self.selected_color
-sce.center = touc.pos
-self.add_widger(sce)
+sce.center = touch.pos
+self.add_widget(sce)
 
 class MyClockApp(App):
     def build(self):
         return sm
 
-class Ex40App(App):
-    def build(self):
-        return Ex40()
-
-
 if __name__ == '__main__':
     MyClockApp().run()
-    Ex40App().run()
