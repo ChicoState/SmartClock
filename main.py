@@ -14,6 +14,7 @@ from kivy.properties import NumericProperty
 from kivy.properties import ListProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.popup import Popup
+from kivy.uix.label import Label
 from kivy.uix.dropdown import DropDown
 from kivy.storage.jsonstore import JsonStore
 from kivy.uix.button import Button
@@ -94,6 +95,10 @@ class Ticks(Widget):
                 self.alarm_func()
                 wait_next_minute = 1
     def alarm_func(self, *args):
+        popup = Popup(title='Test popup',
+    content=Label(text='Hello world'),
+        size_hint=(None, None), size=(400, 400))
+        popup.open()
         sound = SoundLoader.load('alarm.wav')
         if sound:
             sound.play()
