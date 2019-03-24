@@ -95,13 +95,16 @@ class Ticks(Widget):
                 self.alarm_func()
                 wait_next_minute = 1
     def alarm_func(self, *args):
+        content = Button(text= 'dismiss')
         popup = Popup(title='Test popup',
-    content=Label(text='Hello world'),
-        size_hint=(None, None), size=(400, 400))
+    content=content,
+        size_hint=(None, None), size=(400, 400), auto_dismiss=False)
         popup.open()
         sound = SoundLoader.load('alarm.wav')
         if sound:
             sound.play()
+            content.bind(on_press=lambda *args: sound.stop())
+            content.bind(on_press=popup.dismiss)
 
     def update_clock(self, *args):
         self.canvas.clear()
