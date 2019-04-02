@@ -22,8 +22,11 @@ from kivy.uix.colorpicker import ColorPicker
 from kivy.core.audio import SoundLoader
 import time
 import datetime
+from datetime import time
 import subprocess
 import os
+#from lights import RGB
+#from lights import Lights
 
 Builder.load_file('alarmClock.kv');
 Builder.load_file('alarmScreen.kv');
@@ -80,20 +83,31 @@ class Ticks(Widget):
         self.bind(size=self.update_clock)
         Clock.schedule_interval(self.update_clock, 1)
         Clock.schedule_interval(self.checkAlarm, 1)
-    def checkAlarm(self, *args):
-            global alarm_hour
-            global alarm_minute
-            now = datetime.datetime.now()
-            local_hour = int(now.hour)
-            local_minute = int(now.minute)
-            global wait_next_minute
 
-            #logic to ensure alarm function only fires once when it is the alarm time
-            if(wait_next_minute!=0 and local_minute!=alarm_minute):
-                wait_next_minute = 0
-            elif((local_hour == alarm_hour and local_minute == alarm_minute) and wait_next_minute == 0):
-                self.alarm_func()
-                wait_next_minute = 1
+    def checkAlarm(self, *args):
+        global alarm_hour
+        global alarm_minute
+        now = datetime.datetime.now()
+        alarmDateTime = datetime.datetime(now.year, now.month, now.day, alarm_hour, alarm_minute, 0)
+        alarmDeltaThirty = alarmDateTime - datetime.timedelta(minutes=30)
+        local_hour = int(now.hour)
+        local_minute = int(now.minute)
+        global wait_next_minute
+
+        #logic to ensure alarm function only fires once when it is the alarm time
+        if(wait_next_minute!=0 and local_minute!=alarm_minute):
+            wait_next_minute = 0
+
+        elif(now > alarmDeltaThirty):
+            pass
+            #sleep to wake
+            #implement changing colors here
+            #elif()#wake to sleep
+
+        elif((local_hour == alarm_hour and local_minute == alarm_minute) and wait_next_minute == 0):
+            self.alarm_func()
+            wait_next_minute = 1
+
     def alarm_func(self, *args):
         content = Button(text= 'dismiss')
         popup = Popup(title='Test popup',
@@ -227,4 +241,7 @@ class MyClockApp(App):
         return sm
 
 if __name__ == '__main__':
+    #dayColor = RGB(255, 255, 255) #Create a day RGB object (default color white light)
+    #nightColor = RGB(255, 0, 0) #Create a night RGB object (default color red light)
+    #myLights = Lights(dayColor, 0.1, 0, 0) #Create a light object
     MyClockApp().run()
