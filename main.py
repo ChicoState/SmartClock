@@ -1,6 +1,9 @@
 # adapted from https://stackoverflow.com/questions/18923321/making-a-clock-in-kivy
 # adapted from https://github.com/akrog100/Meza/blob/master/main.py
-
+import os
+#comment this line if you have issues testing locally
+#this is for the app to run on the pi
+os.environ['KIVY_GL_BACKEND'] = 'gl'
 from kivy.app import App
 import json
 from kivy.uix.widget import Widget
@@ -23,7 +26,6 @@ from kivy.core.audio import SoundLoader
 import time
 import datetime
 import subprocess
-import os
 # from lights import RGB
 # from lights import Lights
 
