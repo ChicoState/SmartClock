@@ -357,6 +357,14 @@ class SetAlarmButton(Button):
             else:
                 self.text = "Set Alarm\n alarm set to: {}:{}".format(alarm_hour, alarm_minute)
 
+class WhiteNoise(Button):
+    def __init__(self, **kwargs):
+        super(WhiteNoise, self).__init__(**kwargs)
+        self.text = "play"
+    def on_press(self):
+        noise1 = SoundLoader.load('alarm.wav')
+        self.bind(on_press=lambda *args: sound.play())
+
 
 sm = ScreenManager()
 sm.add_widget(HomeScreen(name='home'))
