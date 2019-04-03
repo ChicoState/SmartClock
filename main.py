@@ -361,9 +361,8 @@ class WhiteNoise(Button):
     def __init__(self, **kwargs):
         super(WhiteNoise, self).__init__(**kwargs)
         self.text = "play"
-    def on_press(self):
         noise1 = SoundLoader.load('alarm.wav')
-        self.bind(on_press=lambda *args: sound.play())
+        self.bind(on_press=lambda *args: noise1.play())
 
 
 sm = ScreenManager()
