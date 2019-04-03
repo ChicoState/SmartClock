@@ -32,6 +32,7 @@ import subprocess
 Builder.load_file('alarmClock.kv');
 Builder.load_file('alarmScreen.kv');
 Builder.load_file('lights.kv');
+Builder.load_file('noise.kv')
 
 # dayColor = RGB(255, 255, 255) #Create a day RGB object (default color white light)
 # nightColor = RGB(255, 0, 0) #Create a night RGB object (default color red light)
