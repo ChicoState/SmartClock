@@ -89,15 +89,10 @@ class Ex40(Widget):
         if touch.x < 100 and touch.y < 100:
             return super(Ex40, self).on_touch_down(touch)
 
-class Ticks(Widget):
+class FireAlarm(Widget):
     def __init__(self, **kwargs):
-        super(Ticks, self).__init__(**kwargs)
-        self.bind(pos=self.update_clock)
-        self.bind(size=self.update_clock)
-        Clock.schedule_interval(self.update_clock, 1)
+        super(FireAlarm, self).__init__(**kwargs)
         Clock.schedule_interval(self.checkAlarm, 1)
-        Clock.schedule_interval(self.checkSleep, 1)
-
     def checkAlarm(self, *args):
         global alarm_hour
         global alarm_minute
@@ -141,7 +136,22 @@ class Ticks(Widget):
             self.alarm_func()
             # myLights.setColor(dayColor)
             wait_next_minute = 1
+    def alarm_func(self, *args):
+        content = Button(text= 'dismiss')
+        popup = Popup(title='alarm popup',
+    content=content,
+        size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        popup.open()
+        sound = SoundLoader.load('sounds/alarm.wav')
+        if sound:
+            sound.play()
+            content.bind(on_press=lambda *args: sound.stop())
+            content.bind(on_press=popup.dismiss)
 
+class FireSleep(Widget):
+    def __init__(self, **kwargs):
+        super(FireSleep, self).__init__(**kwargs)
+        Clock.schedule_interval(self.checkSleep, 1)
     def checkSleep(self, *args):
         global sleep_hour
         global sleep_minute
@@ -185,19 +195,6 @@ class Ticks(Widget):
             self.sleep_func()
             # myLights.setColor(nightColor)
             wait_next_sminute = 1
-
-    def alarm_func(self, *args):
-        content = Button(text= 'dismiss')
-        popup = Popup(title='alarm popup',
-    content=content,
-        size_hint=(None, None), size=(400, 400), auto_dismiss=False)
-        popup.open()
-        sound = SoundLoader.load('sounds/alarm.wav')
-        if sound:
-            sound.play()
-            content.bind(on_press=lambda *args: sound.stop())
-            content.bind(on_press=popup.dismiss)
-
     def sleep_func(self, *args):
         content = Button(text= 'dismiss')
         sleep_popup = Popup(title='sleep popup',
@@ -205,6 +202,12 @@ class Ticks(Widget):
         size_hint=(None, None), size=(400, 400))
         sleep_popup.open()
 
+class Ticks(Widget):
+    def __init__(self, **kwargs):
+        super(Ticks, self).__init__(**kwargs)
+        self.bind(pos=self.update_clock)
+        self.bind(size=self.update_clock)
+        Clock.schedule_interval(self.update_clock, 1)
     def update_clock(self, *args):
         self.canvas.clear()
         with self.canvas:
@@ -223,17 +226,14 @@ class SetAlarmPopup(Button):
         self.text = "Set Alarm"
         self.size_hint=(.2,.2);
         self.pos_hint={'x':.2, 'y':.2}
-
     def dismissAlarmPopup(self, instance, button1, button2, button3):
         global alarm_hour
         global alarm_minute
-
         if(button1.text != "Select Hour" and button2.text != "Select Minute"):
             alarm_hour = int(button1.text)
             alarm_minute = int(button2.text)
             currentDay = time.strftime("%A")
             storeAlarm.put(currentDay, alarm_hour = alarm_hour, alarm_minute = alarm_minute)
-
         instance.dismiss()
 
 class SetSleepPopup(Button):
@@ -242,30 +242,24 @@ class SetSleepPopup(Button):
         self.text = "Set Sleep Alarm"
         self.size_hint=(.2,.2);
         self.pos_hint={'x':.6, 'y':.2}
-
     def dismissSleepPopup(self, instance, button1, button2, button4):
         global sleep_hour
         global sleep_minute
-
         if(button1.text != "Select Hour" and button2.text != "Select Minute"):
             sleep_hour = int(button1.text)
             sleep_minute = int(button2.text)
             currentDay = time.strftime("%A")
             storeSleep.put(currentDay, sleep_hour = sleep_hour, sleep_minute = sleep_minute)
-
         instance.dismiss()
 
-class SetAlarmButton(Button):
+class SetTimeButton(Button):
     def __init__(self, **kwargs):
-        super(SetAlarmButton, self).__init__(**kwargs)
+        super(SetTimeButton, self).__init__(**kwargs)
         #schedule this button to continually look to update it's text to reflect the current alarm
         Clock.schedule_interval(self.updateAlarm, 1)
         Clock.schedule_interval(self.updateSleep, 1)
-
-
     def on_press(self):
         Clock.schedule_once(self.alarmPopup)
-
     def alarmPopup(self, *args):
         box = FloatLayout()
         hourbutton = Button(text='Select Hour', size_hint=(.2,.2),
@@ -296,19 +290,16 @@ class SetAlarmButton(Button):
         minutedropdown.bind(on_select=lambda instance, x: setattr(minutebutton, 'text', x))
         box.add_widget(minutebutton)
         box.add_widget(minutedropdown)
-
         #button to dismiss alarm selector and set alarm once user has chosen alarm
         dismissButton1 = SetAlarmPopup()
         dismissButton2 = SetSleepPopup()
         box.add_widget(dismissButton1)
         box.add_widget(dismissButton2)
-
         currentDay = time.strftime("%A")
         alarmPopup = Popup(title='Set Your Alarm for {}:'.format(currentDay), content=box, size_hint=(.8, .8))
         dismissButton1.bind(on_press=partial(dismissButton1.dismissAlarmPopup, alarmPopup, hourbutton, minutebutton))
         dismissButton2.bind(on_press=partial(dismissButton2.dismissSleepPopup, alarmPopup, hourbutton, minutebutton))
         alarmPopup.open()
-
     def updateSleep(self, *args):
         global sleep_hour
         global sleep_minute
@@ -363,7 +354,6 @@ class WhiteNoise(Button):
         self.text = "play"
         noise1 = SoundLoader.load('sounds/noise1.wav')
         self.bind(on_press=lambda *args: noise1.play())
-
 
 sm = ScreenManager()
 sm.add_widget(HomeScreen(name='home'))
