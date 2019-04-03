@@ -192,7 +192,7 @@ class Ticks(Widget):
     content=content,
         size_hint=(None, None), size=(400, 400), auto_dismiss=False)
         popup.open()
-        sound = SoundLoader.load('alarm.wav')
+        sound = SoundLoader.load('sounds/alarm.wav')
         if sound:
             sound.play()
             content.bind(on_press=lambda *args: sound.stop())
@@ -361,7 +361,7 @@ class WhiteNoise(Button):
     def __init__(self, **kwargs):
         super(WhiteNoise, self).__init__(**kwargs)
         self.text = "play"
-        noise1 = SoundLoader.load('alarm.wav')
+        noise1 = SoundLoader.load('sounds/noise1.wav')
         self.bind(on_press=lambda *args: noise1.play())
 
 
