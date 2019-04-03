@@ -66,6 +66,9 @@ class AlarmScreen(Screen):
 class LightScreen(Screen):
     pass
 
+class NoiseScreen(Screen):
+    pass
+
 class LightButton(Button):
    pass
 
@@ -356,6 +359,7 @@ sm = ScreenManager()
 sm.add_widget(HomeScreen(name='home'))
 sm.add_widget(AlarmScreen(name='alarm'))
 sm.add_widget(LightScreen(name='lights'))
+sm.add_widget(NoiseScreen(name='noise'))
 
 #sce = SelectedColorEllipse()
 #sce.selected_color = self.selected_color

@@ -41,13 +41,18 @@
         r: min(root.size)*0.5/2
         pos_hint: {"center_x":0.75, "center_y":0.75}
     Button:
-        text: 'set alarm'
+        text: 'Alarms'
         height: 20
         size_hint: .2, .2
-        pos_hint: {"x" : .1, 'y' : .7} 
+        pos_hint: {"x" : .1, 'y' : .7}
         on_press: root.manager.current = 'alarm'
-    Button: 
+    Button:
         text: 'Lights'
         size_hint: .2, .2
-        pos_hint: {"x" : .1, "y" : .4 } 
+        pos_hint: {"x" : .1, "y" : .4 }
         on_press: root.manager.current = 'lights'
+    Button:
+        text: 'White Noise'
+        size_hint: .2, .2
+        pos_hint: {"x" : .1, "y" : .1 }
+        on_press: root.manager.current = 'noise'
