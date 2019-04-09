@@ -88,7 +88,8 @@ class Ex40(Widget):
     def on_touch_down(self,touch):
         if touch.x < 100 and touch.y < 100:
             return super(Ex40, self).on_touch_down(touch)
-
+# class to check current time against alarm time and
+# fire alarm
 class FireAlarm(Widget):
     def __init__(self, **kwargs):
         super(FireAlarm, self).__init__(**kwargs)
@@ -147,7 +148,8 @@ class FireAlarm(Widget):
             sound.play()
             content.bind(on_press=lambda *args: sound.stop())
             content.bind(on_press=popup.dismiss)
-
+# class to check sleep time against current time and
+# fire  popup - eventually should trigger lights
 class FireSleep(Widget):
     def __init__(self, **kwargs):
         super(FireSleep, self).__init__(**kwargs)
@@ -201,7 +203,7 @@ class FireSleep(Widget):
     content=content,
         size_hint=(None, None), size=(400, 400))
         sleep_popup.open()
-
+# class that updates analog clock on home screen
 class Ticks(Widget):
     def __init__(self, **kwargs):
         super(Ticks, self).__init__(**kwargs)
@@ -219,11 +221,10 @@ class Ticks(Widget):
             Color(0.4, 0.7, 0.4)
             th = clocktime.hour*60 + clocktime.minute
             Line(points=[self.center_x, self.center_y, self.center_x+0.5*self.r*sin(pi/360*th), self.center_y+0.5*self.r*cos(pi/360*th)], width=3, cap="round")
-
+# popup with option to set alarm and logic to store alarm time
 class SetAlarmPopup(Button):
     def __init__(self, **kwargs):
         super(SetAlarmPopup, self).__init__(**kwargs)
-        self.text = "Set Alarm"
         self.size_hint=(.2,.2);
         self.pos_hint={'x':.2, 'y':.2}
     def dismissAlarmPopup(self, instance, button1, button2, button3):
@@ -235,11 +236,10 @@ class SetAlarmPopup(Button):
             currentDay = time.strftime("%A")
             storeAlarm.put(currentDay, alarm_hour = alarm_hour, alarm_minute = alarm_minute)
         instance.dismiss()
-
+# popup to store sleep time
 class SetSleepPopup(Button):
     def __init__(self, **kwargs):
         super(SetSleepPopup, self).__init__(**kwargs)
-        self.text = "Set Sleep Alarm"
         self.size_hint=(.2,.2);
         self.pos_hint={'x':.6, 'y':.2}
     def dismissSleepPopup(self, instance, button1, button2, button4):
@@ -251,7 +251,7 @@ class SetSleepPopup(Button):
             currentDay = time.strftime("%A")
             storeSleep.put(currentDay, sleep_hour = sleep_hour, sleep_minute = sleep_minute)
         instance.dismiss()
-
+# button used to select hour/min for either alarm
 class SetTimeButton(Button):
     def __init__(self, **kwargs):
         super(SetTimeButton, self).__init__(**kwargs)
@@ -347,7 +347,7 @@ class SetTimeButton(Button):
                 self.text = "Set Alarm\n alarm set to: 0{}:{}".format(alarm_hour, alarm_minute)
             else:
                 self.text = "Set Alarm\n alarm set to: {}:{}".format(alarm_hour, alarm_minute)
-
+# button to start white noise sound
 class WhiteNoise(Button):
     def __init__(self, **kwargs):
         super(WhiteNoise, self).__init__(**kwargs)
