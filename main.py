@@ -225,6 +225,7 @@ class Ticks(Widget):
 class SetAlarmPopup(Button):
     def __init__(self, **kwargs):
         super(SetAlarmPopup, self).__init__(**kwargs)
+        self.text = "Set Alarm"
         self.size_hint=(.2,.2);
         self.pos_hint={'x':.2, 'y':.2}
     def dismissAlarmPopup(self, instance, button1, button2, button3):
@@ -240,6 +241,7 @@ class SetAlarmPopup(Button):
 class SetSleepPopup(Button):
     def __init__(self, **kwargs):
         super(SetSleepPopup, self).__init__(**kwargs)
+        self.text = "Set Sleep time"
         self.size_hint=(.2,.2);
         self.pos_hint={'x':.6, 'y':.2}
     def dismissSleepPopup(self, instance, button1, button2, button4):
