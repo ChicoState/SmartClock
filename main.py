@@ -3,7 +3,7 @@
 import os
 #comment this line if you have issues testing locally
 #this is for the app to run on the pi
-os.environ['KIVY_GL_BACKEND'] = 'gl'
+#os.environ['KIVY_GL_BACKEND'] = 'gl'
 from kivy.app import App
 import json
 from kivy.uix.widget import Widget
@@ -33,6 +33,7 @@ Builder.load_file('alarmClock.kv');
 Builder.load_file('alarmScreen.kv');
 Builder.load_file('lights.kv');
 Builder.load_file('noise.kv')
+Builder.load_file('colorLights.kv')
 
 # dayColor = RGB(255, 255, 255) #Create a day RGB object (default color white light)
 # nightColor = RGB(255, 0, 0) #Create a night RGB object (default color red light)
@@ -45,8 +46,8 @@ sleep_minute = 0;
 alarm_changed = 0
 wait_next_sminute = 0
 wait_next_minute = 0
-col = [0,0,1,1]
-#clr_picker = ColorPicker()
+myColor = [0,0,1,1]
+clr_picker = ColorPicker()
 #parent.add_widget(colorpicker)
 storeAlarm = JsonStore('alarm.json')
 storeSleep = JsonStore('sleep.json')
@@ -72,24 +73,23 @@ class LightScreen(Screen):
 class NoiseScreen(Screen):
     pass
 
+class colorLights(Screen):
+    pass
+
 class LightButton(Button):
    pass
-
-class SelectedColorEllipse(Widget):
-    selected_color = ListProperty(col)
 
 class ColPcker(ColorPicker):
     pass
 
-class Ex40(Widget):
-    selected_color = ListProperty(col)
-    def select_ColPckr(self, *args):
-        ColPopup().open()
-    def on_touch_down(self,touch):
+class myColorPicker(Widget):
+    selected_color = ListProperty(myColor)
+    def on_touch_down(self, touch):
         if touch.x < 100 and touch.y < 100:
             return super(Ex40, self).on_touch_down(touch)
-# class to check current time against alarm time and
-# fire alarm
+            return super(myColorPicker, self).on_touch_down(touch)
+
+#class to check cur time against alarm time and fire alarm
 class FireAlarm(Widget):
     def __init__(self, **kwargs):
         super(FireAlarm, self).__init__(**kwargs)
@@ -360,11 +360,7 @@ sm.add_widget(HomeScreen(name='home'))
 sm.add_widget(AlarmScreen(name='alarm'))
 sm.add_widget(LightScreen(name='lights'))
 sm.add_widget(NoiseScreen(name='noise'))
-
-#sce = SelectedColorEllipse()
-#sce.selected_color = self.selected_color
-#sce.center = touch.pos
-#self.add_widget(sce)
+sm.add_widget(colorLights(name='colorLights'))
 
 class MyClockApp(App):
     def build(self):
