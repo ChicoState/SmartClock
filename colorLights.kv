@@ -1,12 +1,11 @@
 <colorLights>:
-    ColPcker:  
+    ColPcker:
         on_color:
             app.root.selected_color = self.color
         Button:
-            text: 'Select'
-            pos_hint: {'center_x' : .76, 'y': .03}
-            size_hint: None, None
-            size: 100, 50
+            text: 'home'
+            size_hint: .2, .2
+            pos_hint: {"x": .5, "y": .8}
             on_press: root.manager.current = 'home'
 
 
@@ -19,7 +18,7 @@
 #<SelectedColorEllipse>:
 	#size : 25, 25
 	# canvas:
-		#Color: 
+		#Color:
 			#rgba:self.selected_color
 		#Ellipse:
 			#size:self.size
