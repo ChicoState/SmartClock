@@ -257,9 +257,8 @@ class SetSleepPopup(Button):
 class SetTimeButton(Button):
     def __init__(self, **kwargs):
         super(SetTimeButton, self).__init__(**kwargs)
-        #schedule this button to continually look to update it's text to reflect the current alarm
-        Clock.schedule_interval(self.updateAlarm, 1)
-        Clock.schedule_interval(self.updateSleep, 1)
+        self.text = "Set Alarm"
+        Clock.schedule_interval(self.updateTimeDisplay, 1)
     def on_press(self):
         Clock.schedule_once(self.alarmPopup)
     def alarmPopup(self, *args):
@@ -302,53 +301,32 @@ class SetTimeButton(Button):
         dismissButton1.bind(on_press=partial(dismissButton1.dismissAlarmPopup, alarmPopup, hourbutton, minutebutton))
         dismissButton2.bind(on_press=partial(dismissButton2.dismissSleepPopup, alarmPopup, hourbutton, minutebutton))
         alarmPopup.open()
-    def updateSleep(self, *args):
+    def updateTimeDisplay(self, *args):
+        global alarm_hour
+        global alarm_minute
         global sleep_hour
         global sleep_minute
         currentDay = time.strftime("%A")
-        self.valign = 'middle'
-        self.halign = 'center'
         if(storeSleep.exists(currentDay)):
             sleep_hour = storeSleep.get(currentDay)['sleep_hour']
             sleep_minute = storeSleep.get(currentDay)['sleep_minute']
+        if(storeAlarm.exists(currentDay)):
+            alarm_hour = storeAlarm.get(currentDay)['alarm_hour']
+            alarm_minute = storeAlarm.get(currentDay)['alarm_minute']
         #default state of alarm button before any alarms are set
         if(sleep_hour == 0 and sleep_minute == 0):
-            self.text = "    Set sleep time\n sleep time not Set".format(sleep_hour, sleep_minute)
-
+            self.text1 = "    Set sleep time\n sleep time not Set".format(sleep_hour, sleep_minute)
         #text formatting to properly display the current alarm
         else:
             if(sleep_hour < 10 and sleep_minute < 10):
-                self.text = "Set sleep time\n sleep time set to: 0{}:0{}".format(sleep_hour, sleep_minute)
+                self.text = "Set sleep time\n sleep time set to: 0{}:0{}\n Set alarm time \n alarm time set to: 0{}:0{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute)
             elif(sleep_minute < 10):
-                self.text = "Set sleep time\n sleep time set to: {}:0{}".format(sleep_hour, sleep_minute)
+                self.text = "Set sleep time\n sleep time set to: {}:0{}\n Set alarm time \n alarm time set to: 0{}:0{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
             elif(sleep_hour < 10):
-                self.text = "Set sleep time\n sleep time set to: 0{}:{}".format(sleep_hour, sleep_minute)
+                self.text = "Set sleep time\n sleep time set to: 0{}:{}\n Set alarm time \n alarm time set to: 0{}:0{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
             else:
-                self.text = "Set sleep time\n sleep time set to: {}:{}".format(sleep_hour, sleep_minute)
-    def updateAlarm(self, *args):
-        global alarm_hour
-        global alarm_minute
-        currentDay = time.strftime("%A")
-        self.valign = 'middle'
-        self.halign = 'center'
-        if storeAlarm.exists(currentDay):
-            alarm_hour = storeAlarm.get(currentDay)['alarm_hour']
-            alarm_minute = storeAlarm.get(currentDay)['alarm_minute']
+                self.text = "Set sleep time\n sleep time set to: {}:{} \n Set alarm time \n alarm time set to: {}:{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
 
-        #default state of alarm button before any alarms are set
-        if(alarm_hour == 0 and alarm_minute == 0):
-            self.text = "    Set Alarm\n Alarm Not Set".format(alarm_hour, alarm_minute)
-
-        #text formatting to properly display the current alarm
-        else:
-            if(alarm_hour < 10 and alarm_minute < 10):
-                self.text = "Set Alarm\n alarm set to: 0{}:0{}".format(alarm_hour, alarm_minute)
-            elif(alarm_minute < 10):
-                self.text = "Set Alarm\n alarm set to: {}:0{}".format(alarm_hour, alarm_minute)
-            elif(alarm_hour < 10):
-                self.text = "Set Alarm\n alarm set to: 0{}:{}".format(alarm_hour, alarm_minute)
-            else:
-                self.text = "Set Alarm\n alarm set to: {}:{}".format(alarm_hour, alarm_minute)
 # button to start white noise sound
 class WhiteNoise(Button):
     def __init__(self, **kwargs):
