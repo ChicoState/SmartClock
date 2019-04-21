@@ -28,12 +28,14 @@ import datetime
 import subprocess
 # from lights import RGB
 # from lights import Lights
+from model import clockModel
 
-Builder.load_file('alarmClock.kv');
-Builder.load_file('alarmScreen.kv');
-Builder.load_file('lights.kv');
+Builder.load_file('clockHomeView.kv')
+Builder.load_file('alarmScreen.kv')
+Builder.load_file('lights.kv')
 Builder.load_file('noise.kv')
 Builder.load_file('colorLights.kv')
+
 
 # dayColor = RGB(255, 255, 255) #Create a day RGB object (default color white light)
 # nightColor = RGB(255, 0, 0) #Create a night RGB object (default color red light)
@@ -51,15 +53,6 @@ clr_picker = ColorPicker()
 #parent.add_widget(colorpicker)
 storeAlarm = JsonStore('alarm.json')
 storeSleep = JsonStore('sleep.json')
-kv = '''
-#:import math math
-
-[ClockNumber@Label]:
-    text: str(ctx.i)
-    pos_hint: {"center_x": 0.5+0.42*math.sin(math.pi/6*(ctx.i-12)), "center_y": 0.5+0.42*math.cos(math.pi/6*(ctx.i-12))}
-    font_size: self.height/16
-'''
-Builder.load_string(kv)
 
 class HomeScreen(Screen):
     pass
@@ -86,7 +79,7 @@ class myColorPicker(Widget):
     selected_color = ListProperty(myColor)
     def on_touch_down(self, touch):
         if touch.x < 100 and touch.y < 100:
-            return super(Ex40, self).on_touch_down(touch)
+            # return super(Ex40, self).on_touch_down(touch)
             return super(myColorPicker, self).on_touch_down(touch)
 
 #class to check cur time against alarm time and fire alarm
@@ -203,24 +196,28 @@ class FireSleep(Widget):
     content=content,
         size_hint=(None, None), size=(400, 400))
         sleep_popup.open()
-# class that updates analog clock on home screen
-class Ticks(Widget):
+
+# Handles the interaction between the clockModel and the clock.kv File
+class clockController(Widget):
     def __init__(self, **kwargs):
-        super(Ticks, self).__init__(**kwargs)
-        self.bind(pos=self.update_clock)
-        self.bind(size=self.update_clock)
-        Clock.schedule_interval(self.update_clock, 1)
-    def update_clock(self, *args):
+        super(clockController, self).__init__(**kwargs)
+        self.bind(pos=self.updateDisplay)
+        self.bind(size=self.updateDisplay)
+        Clock.schedule_interval(self.updateDisplay, 1)
+
+    def updateDisplay(self, *args):
+        myModel = clockModel
         self.canvas.clear()
         with self.canvas:
-            clocktime = datetime.datetime.now()
-            Color(0.2, 0.5, 0.2)
-            Line(points=[self.center_x, self.center_y, self.center_x+0.8*self.r*sin(pi/30*clocktime.second), self.center_y+0.8*self.r*cos(pi/30*clocktime.second)], width=1, cap="round")
+            Color(0.2, 0.5, 0.2) #what colors are these???
+            Line(points=[self.center_x, self.center_y, self.center_x+0.8*self.r*sin(pi/30*myModel.getCurrentSecond(self)), self.center_y+0.8*self.r*cos(pi/30*myModel.getCurrentSecond(self))], width=1, cap="round")
             Color(0.3, 0.6, 0.3)
-            Line(points=[self.center_x, self.center_y, self.center_x+0.7*self.r*sin(pi/30*clocktime.minute), self.center_y+0.7*self.r*cos(pi/30*clocktime.minute)], width=2, cap="round")
+            Line(points=[self.center_x, self.center_y, self.center_x+0.7*self.r*sin(pi/30*myModel.getCurrentMinute(self)), self.center_y+0.7*self.r*cos(pi/30*myModel.getCurrentMinute(self))], width=2, cap="round")
             Color(0.4, 0.7, 0.4)
-            th = clocktime.hour*60 + clocktime.minute
+            th = myModel.getCurrentHour(self)*60 + myModel.getCurrentMinute(self)
             Line(points=[self.center_x, self.center_y, self.center_x+0.5*self.r*sin(pi/360*th), self.center_y+0.5*self.r*cos(pi/360*th)], width=3, cap="round")
+
+
 # popup with option to set alarm and logic to store alarm time
 class SetAlarmPopup(Button):
     def __init__(self, **kwargs):
@@ -237,6 +234,7 @@ class SetAlarmPopup(Button):
             currentDay = time.strftime("%A")
             storeAlarm.put(currentDay, alarm_hour = alarm_hour, alarm_minute = alarm_minute)
         instance.dismiss()
+
 # popup to store sleep time
 class SetSleepPopup(Button):
     def __init__(self, **kwargs):
@@ -253,6 +251,7 @@ class SetSleepPopup(Button):
             currentDay = time.strftime("%A")
             storeSleep.put(currentDay, sleep_hour = sleep_hour, sleep_minute = sleep_minute)
         instance.dismiss()
+
 # button used to select hour/min for either alarm
 class SetTimeButton(Button):
     def __init__(self, **kwargs):
@@ -263,8 +262,7 @@ class SetTimeButton(Button):
         Clock.schedule_once(self.alarmPopup)
     def alarmPopup(self, *args):
         box = FloatLayout()
-        hourbutton = Button(text='Select Hour', size_hint=(.2,.2),
-                            pos_hint={'x':.2, 'y':.5})
+        hourbutton = Button(text='Select Hour', size_hint=(.2,.2), pos_hint={'x':.2, 'y':.5})
         hourdropdown = DropDown()
         for i in range(24):
             if(i<10):
@@ -301,6 +299,7 @@ class SetTimeButton(Button):
         dismissButton1.bind(on_press=partial(dismissButton1.dismissAlarmPopup, alarmPopup, hourbutton, minutebutton))
         dismissButton2.bind(on_press=partial(dismissButton2.dismissSleepPopup, alarmPopup, hourbutton, minutebutton))
         alarmPopup.open()
+        
     def updateTimeDisplay(self, *args):
         global alarm_hour
         global alarm_minute
@@ -345,6 +344,7 @@ sm.add_widget(colorLights(name='colorLights'))
 class MyClockApp(App):
     def build(self):
         return sm
+
 
 if __name__ == '__main__':
     MyClockApp().run()
