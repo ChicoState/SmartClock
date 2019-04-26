@@ -43,18 +43,26 @@
     FireAlarm
     FireSleep
     Button:
-        text: 'Alarms'
-        height: 20
-        size_hint: .2, .2
+        text: 'Settings'
+        height: 15
+        size_hint: .2, .1
         pos_hint: {"x" : .1, 'y' : .7}
+        on_press: root.manager.current = 'settingScreen'
+    Button:
+        text: 'Alarms'
+        height: 15
+        size_hint: .2, .1
+        pos_hint: {"x" : .1, 'y' : .5}
         on_press: root.manager.current = 'alarm'
     Button:
         text: 'Lights'
-        size_hint: .2, .2
-        pos_hint: {"x" : .1, "y" : .4 }
+        height: 15
+        size_hint: .2, .1
+        pos_hint: {"x" : .1, "y" : .3 }
         on_press: root.manager.current = 'colorLights'
     Button:
         text: 'White Noise'
-        size_hint: .2, .2
+        height: 15
+        size_hint: .2, .1
         pos_hint: {"x" : .1, "y" : .1 }
         on_press: root.manager.current = 'noise'

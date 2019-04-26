@@ -34,6 +34,7 @@ Builder.load_file('alarmScreen.kv');
 Builder.load_file('lights.kv');
 Builder.load_file('noise.kv')
 Builder.load_file('colorLights.kv')
+Builder.load_file('settingScreen.kv')
 
 # dayColor = RGB(255, 255, 255) #Create a day RGB object (default color white light)
 # nightColor = RGB(255, 0, 0) #Create a night RGB object (default color red light)
@@ -82,12 +83,32 @@ class LightButton(Button):
 class ColPcker(ColorPicker):
     pass
 
+class settingScreen(Screen):
+    pass
+
 class myColorPicker(Widget):
     selected_color = ListProperty(myColor)
     def on_touch_down(self, touch):
         if touch.x < 100 and touch.y < 100:
             return super(Ex40, self).on_touch_down(touch)
             return super(myColorPicker, self).on_touch_down(touch)
+
+class WifiPopup(Button):
+    def __init__(self, **kwargs):
+        super(WifiPopup, self).__init__(**kwargs)
+        self.text = "Set Wifi"
+    def on_press(self):
+        Clock.schedule_once(self.setWifi)
+    def setWifi(self, *args):
+        content = Button(text='Select Network', size_hint=(.2,.2),
+                            pos_hint={'x':.2, 'y':.5})
+        contentDown = DropDown()
+        content.bind(on_release=contentDown.open)
+        popup = Popup(title='network settings',
+    content=content,
+        size_hint=(None, None), size=(400, 400))
+        popup.open()
+
 
 #class to check cur time against alarm time and fire alarm
 class FireAlarm(Widget):
@@ -341,6 +362,7 @@ sm.add_widget(AlarmScreen(name='alarm'))
 sm.add_widget(LightScreen(name='lights'))
 sm.add_widget(NoiseScreen(name='noise'))
 sm.add_widget(colorLights(name='colorLights'))
+sm.add_widget(settingScreen(name='settingScreen'))
 
 class MyClockApp(App):
     def build(self):
