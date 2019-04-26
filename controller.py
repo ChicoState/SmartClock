@@ -320,7 +320,7 @@ class SetTimeButton(Button):
         dismissButton1.bind(on_press=partial(dismissButton1.dismissAlarmPopup, alarmPopup, hourbutton, minutebutton))
         dismissButton2.bind(on_press=partial(dismissButton2.dismissSleepPopup, alarmPopup, hourbutton, minutebutton))
         alarmPopup.open()
-        
+
     def updateTimeDisplay(self, *args):
         global alarm_hour
         global alarm_minute
@@ -354,6 +354,8 @@ class WhiteNoise(Button):
         self.text = "play"
         noise1 = SoundLoader.load('sounds/noise1.wav')
         self.bind(on_press=lambda *args: noise1.play())
+        noise1.loop = True
+
 
 sm = ScreenManager()
 sm.add_widget(HomeScreen(name='home'))
