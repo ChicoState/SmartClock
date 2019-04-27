@@ -7,6 +7,7 @@ import os
 from kivy.app import App
 import json
 from kivy.uix.widget import Widget
+from kivy.uix.switch import Switch
 from kivy.graphics import Color, Line
 from kivy.uix.floatlayout import FloatLayout
 from math import cos, sin, pi
@@ -348,13 +349,21 @@ class SetTimeButton(Button):
                 self.text = "Set sleep time\n sleep time set to: {}:{} \n Set alarm time \n alarm time set to: {}:{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
 
 # button to start white noise sound
-class WhiteNoise(Button):
+class WhiteNoise(Widget):
     def __init__(self, **kwargs):
         super(WhiteNoise, self).__init__(**kwargs)
-        self.text = "play"
+        # self.text = "play"
+        def callback(instance, value):
+            if(value is True):
+                noise1.play()
+            elif(value is False):
+                noise1.stop()
+        self.text = "white noise"
         noise1 = SoundLoader.load('sounds/noise1.wav')
-        self.bind(on_press=lambda *args: noise1.play())
         noise1.loop = True
+        switch = Switch()
+        switch.bind(active = callback)
+        self.add_widget(switch)
 
 
 sm = ScreenManager()
