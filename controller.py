@@ -27,9 +27,8 @@ from kivy.core.audio import SoundLoader
 import time
 import datetime
 import subprocess
-# from lights import RGB
-# from lights import Lights
 from model import clockModel
+from model import alarmModel
 
 Builder.load_file('clockHomeView.kv')
 Builder.load_file('alarmScreen.kv')
@@ -38,10 +37,7 @@ Builder.load_file('noise.kv')
 Builder.load_file('colorLights.kv')
 Builder.load_file('settingScreen.kv')
 
-
-# dayColor = RGB(255, 255, 255) #Create a day RGB object (default color white light)
-# nightColor = RGB(255, 0, 0) #Create a night RGB object (default color red light)
-# myLights = Lights(dayColor, 0.1, 0, 0) #Create a light object
+myAlarm = alarmModel()
 
 alarm_hour = 0;
 alarm_minute = 0
@@ -105,53 +101,11 @@ class WifiPopup(Button):
 
 
 #class to check cur time against alarm time and fire alarm
-class FireAlarm(Widget):
+class wakeAlarmController(Widget):
     def __init__(self, **kwargs):
-        super(FireAlarm, self).__init__(**kwargs)
-        Clock.schedule_interval(self.checkAlarm, 1)
-    def checkAlarm(self, *args):
-        global alarm_hour
-        global alarm_minute
-        now = datetime.datetime.now()
-        alarmDateTime = datetime.datetime(now.year, now.month, now.day, alarm_hour, alarm_minute, 0)
-        alarmDeltaThirty = alarmDateTime - datetime.timedelta(minutes=30)
-        local_hour = int(now.hour)
-        local_minute = int(now.minute)
-        global wait_next_minute
-
-        # redDistance = dayColor.getRed() - nightColor.getRed() #final - initial
-        # greenDistance = dayColor.getGreen() - nightColor.getGreen() #final - inital
-        # blueDistance = dayColor.getBlue() - nightColor.getBlue() #final - initial
-        # red = 0
-        # green = 0
-        # blue = 0
-
-        #logic to ensure alarm function only fires once when it is the alarm time
-        if(wait_next_minute!=0 and local_minute!=alarm_minute):
-            wait_next_minute = 0
-
-        # if(now > alarmDeltaThirty):
-        #     if(redDistance > 0):
-        #         red = nightColor + (redDistance/30)
-        #     if(redDistance < 0):
-        #         red = nightColor - (redDistance/30)
-
-        #     if(greenDistance > 0):
-        #         green = nightColor + (greenDistance/30)
-        #     if(redDistance < 0):
-        #         green = nightColor - (greenDistance/30)
-
-        #     if(greenDistance > 0):
-        #         blue = nightColor + (blueDistance/30)
-        #     if(redDistance < 0):
-        #         blue = nightColor - (blueDistance/30)
-
-        #     myLights.setRGB(red, green, blue)
-
-        elif((local_hour == alarm_hour and local_minute == alarm_minute) and wait_next_minute == 0):
-            self.alarm_func()
-            # myLights.setColor(dayColor)
-            wait_next_minute = 1
+        super(wakeAlarmController, self).__init__(**kwargs)
+        Clock.schedule_interval(self.myAlarm.checkAlarm(self.alarm_func()), 1)
+        
     def alarm_func(self, *args):
         content = Button(text= 'dismiss')
         popup = Popup(title='alarm popup',
@@ -163,55 +117,14 @@ class FireAlarm(Widget):
             sound.play()
             content.bind(on_press=lambda *args: sound.stop())
             content.bind(on_press=popup.dismiss)
+
 # class to check sleep time against current time and
 # fire  popup - eventually should trigger lights
 class FireSleep(Widget):
     def __init__(self, **kwargs):
         super(FireSleep, self).__init__(**kwargs)
-        Clock.schedule_interval(self.checkSleep, 1)
-    def checkSleep(self, *args):
-        global sleep_hour
-        global sleep_minute
-        now = datetime.datetime.now()
+        Clock.schedule_interval(self.myAlarm.checkSleep(self.sleep_func()), 1)
 
-        sleepDateTime = datetime.datetime(now.year, now.month, now.day, sleep_hour, sleep_minute, 0)
-        sleepDeltaThirty = sleepDateTime - datetime.timedelta(minutes=30)
-        local_shour = int(now.hour)
-        local_sminute = int(now.minute)
-        global wait_next_sminute
-
-        # redDistance = nightColor.getRed() - dayColor.getRed() #final - initial
-        # greenDistance = nightColor.getGreen() - dayColor.getGreen() #final - inital
-        # blueDistance = nightColor.getBlue() - dayColor.getBlue() #final - initial
-        # red = 0
-        # green = 0
-        # blue = 0
-
-        if(wait_next_sminute!=0 and local_sminute!=sleep_minute):
-            wait_next_sminute = 0
-
-        # if(now > sleepDeltaThirty):
-        #     if(redDistance > 0):
-        #         red = dayColor + (redDistance/30)
-        #     if(redDistance < 0):
-        #         red = dayColor - (redDistance/30)
-
-        #     if(greenDistance > 0):
-        #         green = dayColor + (greenDistance/30)
-        #     if(redDistance < 0):
-        #         green = dayColor - (greenDistance/30)
-
-        #     if(greenDistance > 0):
-        #         blue = dayColor + (blueDistance/30)
-        #     if(redDistance < 0):
-        #         blue = dayColor - (blueDistance/30)
-
-        #     myLights.setRGB(red, green, blue)
-
-        elif((local_shour == sleep_hour and local_sminute == sleep_minute) and wait_next_sminute == 0):
-            self.sleep_func()
-            # myLights.setColor(nightColor)
-            wait_next_sminute = 1
     def sleep_func(self, *args):
         content = Button(text= 'dismiss')
         sleep_popup = Popup(title='sleep popup',
@@ -253,8 +166,7 @@ class SetAlarmPopup(Button):
         if(button1.text != "Select Hour" and button2.text != "Select Minute"):
             alarm_hour = int(button1.text)
             alarm_minute = int(button2.text)
-            currentDay = time.strftime("%A")
-            storeAlarm.put(currentDay, alarm_hour = alarm_hour, alarm_minute = alarm_minute)
+            myAlarm.setWakeTime(alarm_hour, alarm_minute)
         instance.dismiss()
 
 # popup to store sleep time
@@ -270,8 +182,7 @@ class SetSleepPopup(Button):
         if(button1.text != "Select Hour" and button2.text != "Select Minute"):
             sleep_hour = int(button1.text)
             sleep_minute = int(button2.text)
-            currentDay = time.strftime("%A")
-            storeSleep.put(currentDay, sleep_hour = sleep_hour, sleep_minute = sleep_minute)
+            myAlarm.setSleepTime(sleep_hour, sleep_minute)
         instance.dismiss()
 
 # button used to select hour/min for either alarm
@@ -329,11 +240,11 @@ class SetTimeButton(Button):
         global sleep_minute
         currentDay = time.strftime("%A")
         if(storeSleep.exists(currentDay)):
-            sleep_hour = storeSleep.get(currentDay)['sleep_hour']
-            sleep_minute = storeSleep.get(currentDay)['sleep_minute']
+            sleep_hour = myAlarm.getSleepHour()
+            sleep_minute = myAlarm.getSleepMin()
         if(storeAlarm.exists(currentDay)):
-            alarm_hour = storeAlarm.get(currentDay)['alarm_hour']
-            alarm_minute = storeAlarm.get(currentDay)['alarm_minute']
+            alarm_hour = myAlarm.getWakeHour()
+            alarm_minute = myAlarm.getWakeMin()
         #default state of alarm button before any alarms are set
         if(sleep_hour == 0 and sleep_minute == 0):
             self.text1 = "    Set sleep time\n sleep time not Set".format(sleep_hour, sleep_minute)
