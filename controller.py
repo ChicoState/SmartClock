@@ -24,6 +24,7 @@ from kivy.storage.jsonstore import JsonStore
 from kivy.uix.button import Button
 from kivy.uix.colorpicker import ColorPicker
 from kivy.core.audio import SoundLoader
+from functools import partial
 import time
 import datetime
 import subprocess
@@ -33,11 +34,13 @@ from model import alarmModel
 Builder.load_file('clockHomeView.kv')
 Builder.load_file('alarmScreen.kv')
 Builder.load_file('lights.kv')
-Builder.load_file('noise.kv')
+# Builder.load_file('noise.kv')
 Builder.load_file('colorLights.kv')
 Builder.load_file('settingScreen.kv')
 
 myAlarm = alarmModel()
+myAlarm.setWakeTime(5, 30)
+myAlarm.setSleepTime(9, 0)
 
 alarm_hour = 0;
 alarm_minute = 0
@@ -61,9 +64,6 @@ class AlarmScreen(Screen):
 class LightScreen(Screen):
     pass
 
-class NoiseScreen(Screen):
-    pass
-
 class colorLights(Screen):
     pass
 
@@ -78,9 +78,9 @@ class settingScreen(Screen):
 
 class myColorPicker(Widget):
     selected_color = ListProperty(myColor)
+
     def on_touch_down(self, touch):
         if touch.x < 100 and touch.y < 100:
-            # return super(Ex40, self).on_touch_down(touch)
             return super(myColorPicker, self).on_touch_down(touch)
 
 class WifiPopup(Button):
@@ -104,15 +104,15 @@ class WifiPopup(Button):
 class wakeAlarmController(Widget):
     def __init__(self, **kwargs):
         super(wakeAlarmController, self).__init__(**kwargs)
-        Clock.schedule_interval(self.myAlarm.checkAlarm(self.alarm_func()), 1)
+        Clock.schedule_interval(partial(myAlarm.checkAlarm, self.alarm_func), 1)
         
-    def alarm_func(self, *args):
+    def alarm_func(self, *args):    
         content = Button(text= 'dismiss')
-        popup = Popup(title='alarm popup',
-    content=content,
-        size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        popup = Popup(title='alarm popup', content=content, size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+
         popup.open()
         sound = SoundLoader.load('sounds/alarm.wav')
+
         if sound:
             sound.play()
             content.bind(on_press=lambda *args: sound.stop())
@@ -123,13 +123,11 @@ class wakeAlarmController(Widget):
 class FireSleep(Widget):
     def __init__(self, **kwargs):
         super(FireSleep, self).__init__(**kwargs)
-        Clock.schedule_interval(self.myAlarm.checkSleep(self.sleep_func()), 1)
+        Clock.schedule_interval(partial(myAlarm.checkSleep, self.sleep_func), 1)
 
     def sleep_func(self, *args):
         content = Button(text= 'dismiss')
-        sleep_popup = Popup(title='sleep popup',
-    content=content,
-        size_hint=(None, None), size=(400, 400))
+        sleep_popup = Popup(title='sleep popup', content=content, size_hint=(None, None), size=(400, 400))
         sleep_popup.open()
 
 # Handles the interaction between the clockModel and the clock.kv File
@@ -160,6 +158,7 @@ class SetAlarmPopup(Button):
         self.text = "Set Alarm"
         self.size_hint=(.2,.2);
         self.pos_hint={'x':.2, 'y':.2}
+        
     def dismissAlarmPopup(self, instance, button1, button2, button3):
         global alarm_hour
         global alarm_minute
@@ -176,6 +175,7 @@ class SetSleepPopup(Button):
         self.text = "Set Sleep time"
         self.size_hint=(.2,.2);
         self.pos_hint={'x':.6, 'y':.2}
+
     def dismissSleepPopup(self, instance, button1, button2, button4):
         global sleep_hour
         global sleep_minute
@@ -191,8 +191,10 @@ class SetTimeButton(Button):
         super(SetTimeButton, self).__init__(**kwargs)
         self.text = "Set Alarm"
         Clock.schedule_interval(self.updateTimeDisplay, 1)
+
     def on_press(self):
         Clock.schedule_once(self.alarmPopup)
+        
     def alarmPopup(self, *args):
         box = FloatLayout()
         hourbutton = Button(text='Select Hour', size_hint=(.2,.2), pos_hint={'x':.2, 'y':.5})
@@ -204,13 +206,14 @@ class SetTimeButton(Button):
                 btn=Button(text = '%r' % i, size_hint_y=None, height =70)
             btn.bind(on_release=lambda btn: hourdropdown.select(btn.text))
             hourdropdown.add_widget(btn)
+
         hourbutton.bind(on_release=hourdropdown.open)
         hourdropdown.bind(on_select=lambda instance, x: setattr(hourbutton, 'text', x))
         box.add_widget(hourbutton)
         box.add_widget(hourdropdown)
-        minutebutton = Button(text='Select Minute', size_hint=(.2,.2),
-                            pos_hint={'x':.6, 'y':.5})
+        minutebutton = Button(text='Select Minute', size_hint=(.2,.2), pos_hint={'x':.6, 'y':.5})
         minutedropdown = DropDown()
+
         for i in range(60):
             if(i<10):
                 btn=Button(text = '0%r' % i, size_hint_y=None, height =70)
@@ -218,15 +221,18 @@ class SetTimeButton(Button):
                 btn=Button(text = '%r' % i, size_hint_y=None, height =70)
             btn.bind(on_release=lambda btn: minutedropdown.select(btn.text))
             minutedropdown.add_widget(btn)
+
         minutebutton.bind(on_release=minutedropdown.open)
         minutedropdown.bind(on_select=lambda instance, x: setattr(minutebutton, 'text', x))
         box.add_widget(minutebutton)
         box.add_widget(minutedropdown)
+
         #button to dismiss alarm selector and set alarm once user has chosen alarm
         dismissButton1 = SetAlarmPopup()
         dismissButton2 = SetSleepPopup()
         box.add_widget(dismissButton1)
         box.add_widget(dismissButton2)
+        
         currentDay = time.strftime("%A")
         alarmPopup = Popup(title='Set Your Alarm for {}:'.format(currentDay), content=box, size_hint=(.8, .8))
         dismissButton1.bind(on_press=partial(dismissButton1.dismissAlarmPopup, alarmPopup, hourbutton, minutebutton))
@@ -234,36 +240,26 @@ class SetTimeButton(Button):
         alarmPopup.open()
 
     def updateTimeDisplay(self, *args):
-        global alarm_hour
-        global alarm_minute
-        global sleep_hour
-        global sleep_minute
-        currentDay = time.strftime("%A")
-        if(storeSleep.exists(currentDay)):
-            sleep_hour = myAlarm.getSleepHour()
-            sleep_minute = myAlarm.getSleepMin()
-        if(storeAlarm.exists(currentDay)):
-            alarm_hour = myAlarm.getWakeHour()
-            alarm_minute = myAlarm.getWakeMin()
-        #default state of alarm button before any alarms are set
-        if(sleep_hour == 0 and sleep_minute == 0):
-            self.text1 = "    Set sleep time\n sleep time not Set".format(sleep_hour, sleep_minute)
+        alarm_hour = myAlarm.getWakeHour()
+        alarm_minute = myAlarm.getWakeMin()
+        sleep_hour = myAlarm.getSleepHour()
+        sleep_minute = myAlarm.getSleepMin()
+
         #text formatting to properly display the current alarm
+        if(sleep_hour < 10 and sleep_minute < 10):
+            self.text = "Set sleep time\n sleep time set to: 0{}:0{}\n Set alarm time \n alarm time set to: 0{}:0{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute)
+        elif(sleep_minute < 10):
+            self.text = "Set sleep time\n sleep time set to: {}:0{}\n Set alarm time \n alarm time set to: 0{}:0{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
+        elif(sleep_hour < 10):
+            self.text = "Set sleep time\n sleep time set to: 0{}:{}\n Set alarm time \n alarm time set to: 0{}:0{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
         else:
-            if(sleep_hour < 10 and sleep_minute < 10):
-                self.text = "Set sleep time\n sleep time set to: 0{}:0{}\n Set alarm time \n alarm time set to: 0{}:0{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute)
-            elif(sleep_minute < 10):
-                self.text = "Set sleep time\n sleep time set to: {}:0{}\n Set alarm time \n alarm time set to: 0{}:0{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
-            elif(sleep_hour < 10):
-                self.text = "Set sleep time\n sleep time set to: 0{}:{}\n Set alarm time \n alarm time set to: 0{}:0{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
-            else:
-                self.text = "Set sleep time\n sleep time set to: {}:{} \n Set alarm time \n alarm time set to: {}:{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
+            self.text = "Set sleep time\n sleep time set to: {}:{} \n Set alarm time \n alarm time set to: {}:{}".format(sleep_hour, sleep_minute, alarm_hour, alarm_minute).format(sleep_hour, sleep_minute)
 
 # button to start white noise sound
 class WhiteNoise(Widget):
     def __init__(self, **kwargs):
         super(WhiteNoise, self).__init__(**kwargs)
-        # self.text = "play"
+        
         def callback(instance, value):
             if(value is True):
                 noise1.play()
@@ -281,7 +277,7 @@ sm = ScreenManager()
 sm.add_widget(HomeScreen(name='home'))
 sm.add_widget(AlarmScreen(name='alarm'))
 sm.add_widget(LightScreen(name='lights'))
-sm.add_widget(NoiseScreen(name='noise'))
+# sm.add_widget(NoiseScreen(name='noise'))
 sm.add_widget(colorLights(name='colorLights'))
 sm.add_widget(settingScreen(name='settingScreen'))
 

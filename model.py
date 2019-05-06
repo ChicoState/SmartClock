@@ -29,34 +29,34 @@ class alarmModel:
 
     def __init__(self):
         self.storeAlarm = JsonStore('alarm.json')
-        self.storeSleep = JsonStore('sleep.json')
+        self.wait_next_minuteW = 0
+        self.wait_next_sminute = 0
     
     def setWakeTime(self, hour, minute):
-        self.storeAlarm.put(time.strftime("%A"), alarm_hour = hour, alarm_minute = minute)
+        self.storeAlarm.put("wakeyWakeyTime", alarm_hour = hour, alarm_minute = minute)
 
     def setSleepTime(self, hour, minute):
-        self.storeSleep.put(time.strftime("%A"), sleep_hour = hour, sleep_minute = minute)
+        self.storeAlarm.put("sleepyTime", sleep_hour = hour, sleep_minute = minute)
 
     def getWakeHour(self):
-        return self.storeAlarm.get(time.strftime("%A"))['alarm_hour']
+        return self.storeAlarm.get("wakeyWakeyTime")['alarm_hour']
 
     def getWakeMin(self):
-        return self.storeAlarm.get(time.strftime("%A"))['alarm_minute']
+        return self.storeAlarm.get("wakeyWakeyTime")['alarm_minute']
 
     def getSleepHour(self):
-        return self.storeSleep.get(time.strftime("%A"))['sleep_hour']
+        return self.storeAlarm.get("sleepyTime")['sleep_hour']
 
     def getSleepMin(self):
-        return self.storeSleep.get(time.strftime("%A"))['sleep_minute']
+        return self.storeAlarm.get("sleepyTime")['sleep_minute']
 
-    def checkSleep(self, *args, callback):
+    def checkSleep(self, callback, *args):
         now = datetime.datetime.now()
 
         sleepDateTime = datetime.datetime(now.year, now.month, now.day, self.getSleepHour(), self.getSleepMin(), 0) #Create a datetime object to calculate the 30 min before
         sleepDeltaThirty = sleepDateTime - datetime.timedelta(minutes=30) #To calculate to turn lights 30 min before
         local_shour = int(now.hour)
         local_sminute = int(now.minute)
-        global wait_next_sminute
 
         # redDistance = nightColor.getRed() - dayColor.getRed() #final - initial
         # greenDistance = nightColor.getGreen() - dayColor.getGreen() #final - inital
@@ -65,8 +65,8 @@ class alarmModel:
         # green = 0
         # blue = 0
 
-        if(wait_next_sminute!=0 and local_sminute!=self.getSleepMin()):
-            wait_next_sminute = 0
+        if(self.wait_next_sminute!=0 and local_sminute!=self.getSleepMin()):
+            self.wait_next_sminute = 0
 
         # if(now > sleepDeltaThirty):
         #     if(redDistance > 0):
@@ -86,19 +86,18 @@ class alarmModel:
 
         #     myLights.setRGB(red, green, blue)
 
-        elif((local_shour == self.getSleepHour() and local_sminute == self.getSleepMin()) and wait_next_sminute == 0):
+        elif((local_shour == self.getSleepHour() and local_sminute == self.getSleepMin()) and self.wait_next_sminute == 0):
             callback()
             # myLights.setColor(nightColor)
-            wait_next_sminute = 1
+            self.wait_next_sminute = 1
 
-    def checkAlarm(self, *args, callback):
+    def checkAlarm(self, callback, *args):
         now = datetime.datetime.now()
-
+        
         alarmDateTime = datetime.datetime(now.year, now.month, now.day, self.getWakeHour(), self.getWakeMin(), 0)#Create a datetime object to calculate the 30 min before
         alarmDeltaThirty = alarmDateTime - datetime.timedelta(minutes=30)#To calculate to turn lights 30 min before
         local_hour = int(now.hour)
         local_minute = int(now.minute)
-        global wait_next_minute
 
         # redDistance = dayColor.getRed() - nightColor.getRed() #final - initial
         # greenDistance = dayColor.getGreen() - nightColor.getGreen() #final - inital
@@ -108,8 +107,8 @@ class alarmModel:
         # blue = 0
 
         #logic to ensure alarm function only fires once when it is the alarm time
-        if(wait_next_minute!=0 and local_minute != self.getWakeMin()):
-            wait_next_minute = 0
+        if(self.wait_next_minuteW != 0 and local_minute != self.getWakeMin()):
+            self.wait_next_minuteW = 0
 
         # if(now > alarmDeltaThirty):
         #     if(redDistance > 0):
@@ -129,10 +128,10 @@ class alarmModel:
 
         #     myLights.setRGB(red, green, blue)
 
-        elif((local_hour == self.getWakeHour() and local_minute == self.getWakeMin()) and wait_next_minute == 0):
+        elif((local_hour == self.getWakeHour() and local_minute == self.getWakeMin()) and self.wait_next_minuteW == 0):
             callback()
             # myLights.setColor(dayColor)
-            wait_next_minute = 1
+            self.wait_next_minuteW = 1
 
 
 
