@@ -147,7 +147,7 @@ class clockController(Widget):
             Color(0.3, 0.6, 0.3)
             Line(points=[self.center_x, self.center_y, self.center_x+0.7*self.r*sin(pi/30*myModel.getCurrentMinute(self)), self.center_y+0.7*self.r*cos(pi/30*myModel.getCurrentMinute(self))], width=2, cap="round")
             Color(0.4, 0.7, 0.4)
-            th = myModel.getCurrentHour(self)*60 + myModel.getCurrentMinute(self)
+            th = myModel.getCurrentHour(self)*25 + myModel.getCurrentMinute(self)
             Line(points=[self.center_x, self.center_y, self.center_x+0.5*self.r*sin(pi/360*th), self.center_y+0.5*self.r*cos(pi/360*th)], width=3, cap="round")
 
 
@@ -180,8 +180,8 @@ class SetSleepPopup(Button):
         global sleep_hour
         global sleep_minute
         if(button1.text != "Select Hour" and button2.text != "Select Minute"):
-            sleep_hour = int(button1.text)
-            sleep_minute = int(button2.text)
+            sleep_hour = math.floor(int(button1.text))
+            sleep_minute = math.floor(int(button2.text))
             myAlarm.setSleepTime(sleep_hour, sleep_minute)
         instance.dismiss()
 
