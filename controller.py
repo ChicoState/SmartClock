@@ -30,6 +30,8 @@ import datetime
 import subprocess
 from model import clockModel
 from model import alarmModel
+import board
+import neopixel
 
 Builder.load_file('clockHomeView.kv')
 Builder.load_file('alarmScreen.kv')
@@ -52,8 +54,6 @@ wait_next_minute = 0
 myColor = [0,0,1,1]
 clr_picker = ColorPicker()
 #parent.add_widget(colorpicker)
-storeAlarm = JsonStore('alarm.json')
-storeSleep = JsonStore('sleep.json')
 
 class HomeScreen(Screen):
     pass
@@ -259,7 +259,7 @@ class SetTimeButton(Button):
 class WhiteNoise(Widget):
     def __init__(self, **kwargs):
         super(WhiteNoise, self).__init__(**kwargs)
-        
+        pos_hint = {"x" : .5, "y" : .1} 
         def callback(instance, value):
             if(value is True):
                 noise1.play()
@@ -271,8 +271,20 @@ class WhiteNoise(Widget):
         switch = Switch()
         switch.bind(active = callback)
         self.add_widget(switch)
+class RedLight(Widget):
+    def __init__(self, **kwargs):
+        super(RedLight, self).__init__(**kwargs)
 
-
+        def callback(instance, value):
+           # if(value is True):
+            pixels = neopixel.NeoPixel(board.D18,30)
+            pixels[0] = (255, 0, 0)
+            #elif(value is False):
+             #   pixels = neopixel.NeoPixel(board.D18, 30)
+              #  pixels[0] = (0, 0, 0)
+        switch = Switch()
+        switch.bind(active = callback)
+        self.add_widget(switch)
 sm = ScreenManager()
 sm.add_widget(HomeScreen(name='home'))
 sm.add_widget(AlarmScreen(name='alarm'))
