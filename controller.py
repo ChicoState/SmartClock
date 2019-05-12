@@ -179,8 +179,8 @@ class SetSleepPopup(Button):
         global sleep_hour
         global sleep_minute
         if(button1.text != "Select Hour" and button2.text != "Select Minute"):
-            sleep_hour = math.floor(int(button1.text))
-            sleep_minute = math.floor(int(button2.text))
+            sleep_hour = int(button1.text)
+            sleep_minute = int(button2.text)
             myAlarm.setSleepTime(sleep_hour, sleep_minute)
         instance.dismiss()
 
