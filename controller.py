@@ -30,13 +30,13 @@ import datetime
 import subprocess
 from model import clockModel
 from model import alarmModel
-import board
-import neopixel
+#uncomment to run lights on the pi
+#import board
+#import neopixel
 
 Builder.load_file('clockHomeView.kv')
 Builder.load_file('alarmScreen.kv')
 Builder.load_file('lights.kv')
-# Builder.load_file('noise.kv')
 Builder.load_file('colorLights.kv')
 Builder.load_file('settingScreen.kv')
 
@@ -53,7 +53,6 @@ wait_next_sminute = 0
 wait_next_minute = 0
 myColor = [0,0,1,1]
 clr_picker = ColorPicker()
-#parent.add_widget(colorpicker)
 
 class HomeScreen(Screen):
     pass
@@ -105,8 +104,8 @@ class wakeAlarmController(Widget):
     def __init__(self, **kwargs):
         super(wakeAlarmController, self).__init__(**kwargs)
         Clock.schedule_interval(partial(myAlarm.checkAlarm, self.alarm_func), 1)
-        
-    def alarm_func(self, *args):    
+
+    def alarm_func(self, *args):
         content = Button(text= 'dismiss')
         popup = Popup(title='alarm popup', content=content, size_hint=(None, None), size=(400, 400), auto_dismiss=False)
 
@@ -158,7 +157,7 @@ class SetAlarmPopup(Button):
         self.text = "Set Alarm"
         self.size_hint=(.2,.2);
         self.pos_hint={'x':.2, 'y':.2}
-        
+
     def dismissAlarmPopup(self, instance, button1, button2, button3):
         global alarm_hour
         global alarm_minute
@@ -194,7 +193,7 @@ class SetTimeButton(Button):
 
     def on_press(self):
         Clock.schedule_once(self.alarmPopup)
-        
+
     def alarmPopup(self, *args):
         box = FloatLayout()
         hourbutton = Button(text='Select Hour', size_hint=(.2,.2), pos_hint={'x':.2, 'y':.5})
@@ -232,7 +231,7 @@ class SetTimeButton(Button):
         dismissButton2 = SetSleepPopup()
         box.add_widget(dismissButton1)
         box.add_widget(dismissButton2)
-        
+
         currentDay = time.strftime("%A")
         alarmPopup = Popup(title='Set Your Alarm for {}:'.format(currentDay), content=box, size_hint=(.8, .8))
         dismissButton1.bind(on_press=partial(dismissButton1.dismissAlarmPopup, alarmPopup, hourbutton, minutebutton))
@@ -259,7 +258,7 @@ class SetTimeButton(Button):
 class WhiteNoise(Widget):
     def __init__(self, **kwargs):
         super(WhiteNoise, self).__init__(**kwargs)
-        pos_hint = {"x" : .5, "y" : .1} 
+        pos_hint = {"x" : .5, "y" : .1}
         def callback(instance, value):
             if(value is True):
                 noise1.play()
@@ -271,25 +270,26 @@ class WhiteNoise(Widget):
         switch = Switch()
         switch.bind(active = callback)
         self.add_widget(switch)
-class RedLight(Widget):
-    def __init__(self, **kwargs):
-        super(RedLight, self).__init__(**kwargs)
 
-        def callback(instance, value):
-           # if(value is True):
-            pixels = neopixel.NeoPixel(board.D18,30)
-            pixels[0] = (255, 0, 0)
-            #elif(value is False):
-             #   pixels = neopixel.NeoPixel(board.D18, 30)
-              #  pixels[0] = (0, 0, 0)
-        switch = Switch()
-        switch.bind(active = callback)
-        self.add_widget(switch)
+# class RedLight(Widget):
+#     def __init__(self, **kwargs):
+#         super(RedLight, self).__init__(**kwargs)
+#
+#         def callback(instance, value):
+#            if(value is True):
+#                pixels = neopixel.NeoPixel(board.D18,30)
+#                pixels[0] = (255, 0, 0)
+#            elif(value is False):
+#                pixels = neopixel.NeoPixel(board.D18, 30)
+#                pixels[0] = (0, 0, 0)
+#         switch = Switch()
+#         switch.bind(active = callback)
+#         self.add_widget(switch)
+
 sm = ScreenManager()
 sm.add_widget(HomeScreen(name='home'))
 sm.add_widget(AlarmScreen(name='alarm'))
 sm.add_widget(LightScreen(name='lights'))
-# sm.add_widget(NoiseScreen(name='noise'))
 sm.add_widget(colorLights(name='colorLights'))
 sm.add_widget(settingScreen(name='settingScreen'))
 
