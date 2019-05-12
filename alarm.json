@@ -1,1 +1,1 @@
-{"wakeyWakeyTime": {"alarm_hour": 5, "alarm_minute": 30}, "sleepyTime": {"sleep_hour": 9, "sleep_minute": 0}}
+{"SleepTime": {"sleep_hour": 2, "sleep_minute": 1}, "AlarmTime": {"alarm_minute": 1, "alarm_hour": 2}, "sleepyTime": {"sleep_hour": 20, "sleep_minute": 55}, "wakeyWakeyTime": {"alarm_hour": 20, "alarm_minute": 55}, "SleepTimeTime": {"sleep_hour": 9, "sleep_minute": 0}}
