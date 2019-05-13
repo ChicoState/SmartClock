@@ -41,8 +41,6 @@ Builder.load_file('colorLights.kv')
 Builder.load_file('settingScreen.kv')
 
 myAlarm = alarmModel()
-myAlarm.setWakeTime(5, 30)
-myAlarm.setSleepTime(9, 0)
 
 alarm_hour = 0;
 alarm_minute = 0
